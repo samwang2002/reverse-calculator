@@ -5,7 +5,65 @@
     </head>
 
     <body>
-        I find expressions
+        <label>Input number:</label>
+        <input type="number" id="num-form">
+        <input type="submit" value="Add Number" onclick="addNum()">
+        <input type="submit" value="Find Expression" onclick="findExp()">
     </body>
+
+    <script>
+        var numbers = Array();
+
+        function addNum() {
+            let num = document.getElementById("num-form").value;
+            numbers.push(num);
+            console.log(num);
+            document.getElementById("num-form").value = '';
+        }
+
+        // calculation part
+        function permute(nums) {
+            let n = nums.length;
+            var permutations = Array();
+
+            // base case
+            if (n == 1) {
+                permutations.push(nums);
+                return permutations;
+            }
+
+            // recursive case
+            var seen = {};          // prevents repeats
+            let subPerms = permute(nums.slice(1, n));
+            console.log("nums: [" + nums + "]\tall subperms: [" + subPerms + "]");
+            for (var i = 0; i < n; i++) {
+                let m = subPerms.length;
+                for (var j = 0; j < m; j++) {
+                    // create new permutation with first element inserted somewhere
+                    var p = subPerms[j].slice(0, i);
+                    p.push(nums[0]);
+                    p.push(...(subPerms[j].slice(i, n)));
+                    console.log("nums: [" + nums + "]\tfound permutation: [" + p + "]");
+
+                    // make sure permutation isn't duplicate
+                    let p_str = p.join(',');
+                    if (!(p_str in seen)) {
+                        seen[p_str] = 1;
+                        permutations.push(p);
+                    }
+                }
+            }
+
+            return permutations;
+        }
+
+        function findExp() {
+            console.log("input numbers: [" + numbers + "]");
+            // if (numbers.length < 2) return;
+
+            console.log("final answer:");
+            console.log(permute(numbers));
+        }
+    </script>
 
 </html>
