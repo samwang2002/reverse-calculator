@@ -14,14 +14,25 @@
     <script>
         var numbers = Array();
 
+        // adds input number to array
         function addNum() {
-            let num = document.getElementById("num-form").value;
+            let num = parseInt(document.getElementById("num-form").value);
             numbers.push(num);
             console.log(num);
             document.getElementById("num-form").value = '';
         }
 
-        // calculation part
+        // finds an expression with the numbers
+        function findExp() {
+            console.log("input numbers: [" + numbers + "]");
+            // if (numbers.length < 2) return;
+
+            console.log("final answer:");
+            console.log(allCombos(numbers));
+        }
+
+        // ------------ calculation part --------------
+        // calculates all permutations of an array of numbers
         function permute(nums) {
             let n = nums.length;
             var permutations = Array();
@@ -57,12 +68,115 @@
             return permutations;
         }
 
-        function findExp() {
-            console.log("input numbers: [" + numbers + "]");
-            // if (numbers.length < 2) return;
+        // calculate all combinations of nonempty array
+        // returns array of tuples: value, string, and last operation
+        function allCombos(nums) {
+            let n = nums.length;
+            var results = Array();
 
-            console.log("final answer:");
-            console.log(permute(numbers));
+            // base case: n = 1
+            if (n == 1) {
+                results.push([nums[0], nums[0].toString(), null]);
+                return results;
+            }
+
+            // base case: n = 2
+            var seen = {};
+            if (n == 2) {
+                // addition
+                results.push([nums[0]+nums[1], nums[0]+'+'+nums[1], '+']);
+                seen[nums[0]+nums[1]] = 1;
+
+
+                // subtraction
+                if (nums[1] != 0) {
+                    results.push([nums[0]-nums[1], nums[0]+'-'+nums[1], '-']);
+                    seen[nums[0]-nums[1]] = 1;
+                }
+                
+                // multiplication
+                if (!(nums[0]*nums[1] in seen)) {
+                    results.push([nums[0]*nums[1], nums[0]+'*'+nums[1], '*']);
+                    seen[nums[0]*nums[1]] = 1;
+                }
+                
+                if (nums[1] != 0) {
+                    // division
+                    if (nums[0]%nums[1] == 0 && !(nums[0]%nums[1] in seen)) {
+                        results.push([nums[0]/nums[1], nums[0]+'/'+nums[1], '/']);
+                        seen[nums[0]/nums[1]] = 1;
+                    }
+                    
+                    // modulus
+                    if (!(nums[0]%nums[1] in seen)) {
+                        results.push([nums[0]%nums[1], nums[0]+'%'+nums[1], '%']);
+                        seen[nums[0]%nums[1]] = 1;
+                    }
+                }
+                return results;
+            }
+
+            // recursive case: n > 2
+            for (var idx = 0; idx < n-1; idx++) {     // operator can go after 0, 1, ..., n-1th element
+                let results1 = allCombos(nums.slice(0, idx+1));
+                let results2 = allCombos(nums.slice(idx+1, n));
+
+                for (var i = 0; i < results1.length; i++) {
+                    for (var j = 0; j < results2.length; j++) {
+                        const [num1, str1, op1] = results1[i];
+                        const [num2, str2, op2] = results2[j];
+
+                        // addition
+                        if (!(num1+num2 in seen)) {
+                            results.push([num1+num2, combineStrs(str1, str2, op1, op2, '+'), '+']);
+                            seen[num1+num2] = 1;
+                        }
+
+                        // subtraction
+                        if (!(num1-num2 in seen)) {
+                            results.push([num1-num2, combineStrs(str1, str2, op1, op2, '-'), '-']);
+                            seen[num1-num2] = 1;
+                        }
+
+                        // multiplication
+                        if (!(num1*num2 in seen)) {
+                            results.push([num1*num2, combineStrs(str1, str2, op1, op2, '*'), '*']);
+                            seen[num1*num2] = 1;
+                        }
+
+                        if (num2 != 0) {
+                            // division
+                            if (num1%num2 == 0 && !(num1/num2 in seen)) {
+                                results.push([num1/num2, combineStrs(str1, str2, op1, op2, '/'), '-']);
+                                seen[num1/num2] = 1;
+                            }
+
+                            // modulus
+                            if (!(num1%num2 in seen)) {
+                                results.push([num1%num2, combineStrs(str1, str2, op1, op2, '%'), '%']);
+                                seen[num1%num2] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            return results;
+        }
+
+        // creates new expression string by combining two existing expressions
+        function combineStrs(str1, str2, op1, op2, op) {
+            var str = "";
+            if (op1 == null || (op1 == '+' && op == '+') || (op1 == '-' && op == '+') || (op1 == '+' && op == '-')
+                || (op1 == '*' && op == '*'))
+                str += str1;
+            else
+                str += "(" + str1 + ")";
+            str += op;
+            if (op2 == null || (op2 == '+' && op == '+') || (op2 == '-' && op == '+') || (op2 == '*' && op == '*'))
+                str += str2;
+            else
+                str += "(" + str2 + ")";
+            return str;
         }
     </script>
 
