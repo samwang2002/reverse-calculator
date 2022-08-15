@@ -2,13 +2,67 @@
 <html>
     <head>
         <title>Reverse Calculator</title>
+
+        <style>
+            body {
+                font-size: 18px;
+                font-family: 'Courier New', Courier, monospace;
+                margin: 30px;
+                background-color: #111111;
+                color: white;
+            }
+
+            label {
+                font-size: 24px;
+            }
+
+            input {
+                box-sizing: border-box;
+                font-size: 24px;
+                font-family: 'Courier New', Courier, monospace;
+            }
+
+            input[type=text] {
+                background: none;
+                color: white;
+                border: none;
+                border-bottom: 1px solid white;
+                padding: 2px 5px;
+                box-sizing: border-box;
+            }
+
+            ::placeholder {
+                color: white;
+                opacity: 0.5;
+            }
+
+            input:focus {
+                outline: none;
+            }
+
+            #inputs-form {
+                width: 420px;
+            }
+
+            #answer-form {
+                width: 80px;
+            }
+
+            #error-msg {
+                margin-top: 5px;
+                color: red;
+            }
+        </style>
     </head>
 
     <body>
-        <label>Input number:</label>
-        <input type="number" id="num-form">
-        <input type="submit" value="Add Number" onclick="addNum()">
-        <input type="submit" value="Find Expression" onclick="findExp()">
+        <label>inputs:</label>
+        <input type="text" id="inputs-form" placeholder="1, 2, 3, 4">
+        <label>answer:</label>
+        <input type="text" id="answer-form" placeholder="10">
+        <input type="submit" value="find" onclick="findExp()">
+        <br>
+        <div id="error-msg"></div>
     </body>
 
     <script>
@@ -81,37 +135,23 @@
             }
 
             // base case: n = 2
-            var seen = {};
             if (n == 2) {
                 // addition
                 results.push([nums[0]+nums[1], nums[0]+'+'+nums[1], '+']);
-                seen[nums[0]+nums[1]] = 1;
-
 
                 // subtraction
-                if (nums[1] != 0) {
-                    results.push([nums[0]-nums[1], nums[0]+'-'+nums[1], '-']);
-                    seen[nums[0]-nums[1]] = 1;
-                }
+                results.push([nums[0]-nums[1], nums[0]+'-'+nums[1], '-']);
                 
                 // multiplication
-                if (!(nums[0]*nums[1] in seen)) {
-                    results.push([nums[0]*nums[1], nums[0]+'*'+nums[1], '*']);
-                    seen[nums[0]*nums[1]] = 1;
-                }
+                results.push([nums[0]*nums[1], nums[0]+'*'+nums[1], '*']);
                 
                 if (nums[1] != 0) {
                     // division
-                    if (nums[0]%nums[1] == 0 && !(nums[0]%nums[1] in seen)) {
+                    if (nums[0]%nums[1] == 0)
                         results.push([nums[0]/nums[1], nums[0]+'/'+nums[1], '/']);
-                        seen[nums[0]/nums[1]] = 1;
-                    }
                     
                     // modulus
-                    if (!(nums[0]%nums[1] in seen)) {
-                        results.push([nums[0]%nums[1], nums[0]+'%'+nums[1], '%']);
-                        seen[nums[0]%nums[1]] = 1;
-                    }
+                    results.push([nums[0]%nums[1], nums[0]+'%'+nums[1], '%']);
                 }
                 return results;
             }
@@ -127,35 +167,21 @@
                         const [num2, str2, op2] = results2[j];
 
                         // addition
-                        if (!(num1+num2 in seen)) {
-                            results.push([num1+num2, combineStrs(str1, str2, op1, op2, '+'), '+']);
-                            seen[num1+num2] = 1;
-                        }
+                        results.push([num1+num2, combineStrs(str1, str2, op1, op2, '+'), '+']);
 
                         // subtraction
-                        if (!(num1-num2 in seen)) {
-                            results.push([num1-num2, combineStrs(str1, str2, op1, op2, '-'), '-']);
-                            seen[num1-num2] = 1;
-                        }
+                        results.push([num1-num2, combineStrs(str1, str2, op1, op2, '-'), '-']);
 
                         // multiplication
-                        if (!(num1*num2 in seen)) {
-                            results.push([num1*num2, combineStrs(str1, str2, op1, op2, '*'), '*']);
-                            seen[num1*num2] = 1;
-                        }
+                        results.push([num1*num2, combineStrs(str1, str2, op1, op2, '*'), '*']);
 
                         if (num2 != 0) {
                             // division
-                            if (num1%num2 == 0 && !(num1/num2 in seen)) {
-                                results.push([num1/num2, combineStrs(str1, str2, op1, op2, '/'), '-']);
-                                seen[num1/num2] = 1;
-                            }
+                            if (num1%num2 == 0)
+                            results.push([num1/num2, combineStrs(str1, str2, op1, op2, '/'), '-']);
 
                             // modulus
-                            if (!(num1%num2 in seen)) {
-                                results.push([num1%num2, combineStrs(str1, str2, op1, op2, '%'), '%']);
-                                seen[num1%num2] = 1;
-                            }
+                            results.push([num1%num2, combineStrs(str1, str2, op1, op2, '%'), '%']);
                         }
                     }
                 }
